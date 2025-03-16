@@ -1,0 +1,22 @@
+name: 'Repello Artemis Security Scanner'
+description: 'Run Repello Artemis security scans on your assets'
+author: 'Repello AI'
+branding:
+  icon: 'shield'
+  color: 'blue'
+
+inputs:
+  asset_id:
+    description: 'The ID of the asset to scan'
+    required: true
+  scan_type:
+    description: 'Type of scan to run (quick_scan, safety_scan, owasp, mitre, nist, whistleblower, fingerprint)'
+    required: true
+    default: 'quick_scan'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.asset_id }}
+    - ${{ inputs.scan_type }}
