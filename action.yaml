@@ -9,8 +9,8 @@ inputs:
   asset_id:
     description: 'The ID of the asset to scan'
     required: true
-  scan_type:
-    description: 'Type of scan to run (quick_scan, safety_scan, owasp, mitre, nist, whistleblower, fingerprint)'
+  scan_types:
+    description: 'Type(s) of scan to run. Use individual values (quick_scan, safety_scan, owasp, mitre, nist, whistleblower, fingerprint) or any comma-separated combination.'
     required: true
     default: 'quick_scan'
 
@@ -19,4 +19,4 @@ runs:
   image: 'Dockerfile'
   args:
     - ${{ inputs.asset_id }}
-    - ${{ inputs.scan_type }}
+    - ${{ inputs.scan_types }}

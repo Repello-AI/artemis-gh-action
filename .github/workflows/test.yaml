@@ -12,19 +12,11 @@ on:
       asset_id:
         description: 'Asset ID to scan (defaults to secret DEFAULT_ASSET_ID if not provided)'
         required: false
-      scan_type:
-        description: 'Type of scan'
+      scan_types:
+        description: 'Type(s) of scan to run (comma-separated for multiple scans, e.g., "quick_scan,safety_scan")'
         required: true
-        default: 'quick_scan'
-        type: choice
-        options:
-          - quick_scan
-          - safety_scan
-          - owasp
-          - mitre
-          - nist
-          - whistleblower
-          - fingerprint
+        default: 'quick_scan,owasp'
+        type: string
 
 jobs:
   test-action:
@@ -37,7 +29,7 @@ jobs:
         uses: ./
         with:
           asset_id: ${{ github.event.inputs.asset_id || secrets.DEFAULT_ASSET_ID }}
-          scan_type: ${{ github.event.inputs.scan_type || 'quick_scan' }}
+          scan_types: ${{ github.event.inputs.scan_types || 'quick_scan,owasp' }}
         env:
           ARTEMIS_CLIENT_ID: ${{ secrets.ARTEMIS_CLIENT_ID }}
           ARTEMIS_CLIENT_SECRET: ${{ secrets.ARTEMIS_CLIENT_SECRET }}

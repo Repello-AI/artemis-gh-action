@@ -18,19 +18,11 @@ on:
       asset_id:
         description: 'Asset ID to scan (defaults to secret DEFAULT_ASSET_ID if not provided)'
         required: false
-      scan_type:
-        description: 'Type of scan'
+      scan_types:
+        description: 'Type(s) of scan to run (comma-separated for multiple scans)'
         required: true
         default: 'quick_scan'
-        type: choice
-        options:
-          - quick_scan
-          - safety_scan
-          - owasp
-          - mitre
-          - nist
-          - whistleblower
-          - fingerprint
+        type: string
 
 jobs:
   security-scan:
@@ -43,7 +35,7 @@ jobs:
         uses: repello-ai/artemis-gh-action@v1
         with:
           asset_id: ${{ github.event.inputs.asset_id || secrets.DEFAULT_ASSET_ID }}
-          scan_type: ${{ github.event.inputs.scan_type || 'quick_scan' }}
+          scan_types: ${{ github.event.inputs.scan_types || 'quick_scan' }}
         env:
           ARTEMIS_CLIENT_ID: ${{ secrets.ARTEMIS_CLIENT_ID }}
           ARTEMIS_CLIENT_SECRET: ${{ secrets.ARTEMIS_CLIENT_SECRET }}
@@ -54,19 +46,51 @@ jobs:
 | Input | Description | Required | Default |
 |-------|-------------|----------|---------|
 | `asset_id` | The ID of the asset to scan | No* | Uses `DEFAULT_ASSET_ID` secret |
-| `scan_type` | Type of scan to run | Yes | `quick_scan` |
+| `scan_types` | Type(s) of scan to run (comma-separated for multiple scans) | Yes | `quick_scan` |
 
 \* While the `asset_id` parameter is optional in the workflow, you must either provide it as an input or set up the `DEFAULT_ASSET_ID` secret.
 
+### Examples
+
+Run a single scan:
+```yaml
+- name: Run Quick Scan
+  uses: repello-ai/artemis-gh-action@v1
+  with:
+    asset_id: "6abec05b-0245-4d38-9a2a-df8045cba142"
+    scan_types: "quick_scan"
+```
+
+Run multiple scans:
+```yaml
+- name: Run Multiple Scans
+  uses: repello-ai/artemis-gh-action@v1
+  with:
+    asset_id: "6abec05b-0245-4d38-9a2a-df8045cba142"
+    scan_types: "quick_scan,safety_scan,mitre"
+```
+
 ### Supported Scan Types
 
-- `quick_scan`: Basic scan for common issues
-- `safety_scan`: Focused on safety concerns
-- `owasp`: Scan based on OWASP guidelines
-- `mitre`: Scan based on MITRE ATT&CK framework
-- `nist`: Scan based on NIST standards
-- `whistleblower`: Dedicated whistleblower vulnerability scan
-- `fingerprint`: Digital fingerprinting scan
+You can use any of the following scan types, individually or in combination (comma-separated):
+
+| Scan Type | Description |
+|-----------|-------------|
+| `quick_scan` | Basic scan for common issues (fastest scan) |
+| `safety_scan` | Comprehensive scan focused on safety concerns |
+| `owasp` | Scan based on OWASP Top 10 guidelines |
+| `mitre` | Scan based on MITRE ATT&CK framework |
+| `nist` | Scan based on NIST standards and compliance |
+| `whistleblower` | Dedicated whistleblower vulnerability scan |
+| `fingerprint` | Model fingerprinting scan |
+
+### Example Combinations
+
+Some commonly used combinations include:
+- `quick_scan,safety_scan`: For a balance of speed and comprehensive safety checking
+- `owasp,mitre`: For a thorough security assessment against industry standards
+- `quick_scan,fingerprint`: For identifying assets and performing basic security checks
+- `safety_scan,nist,whistleblower`: For organizations requiring compliance and protection
 
 ## Environment Variables and Secrets
 
@@ -87,7 +111,7 @@ To contribute to this action:
 1. Clone the repository
 2. Install dependencies: `pip install -r requirements.txt`
 3. Make your changes to `main.py`
-4. Test locally by running: `python main.py <asset_id> <scan_type>`
+4. Test locally by running: `python main.py <asset_id> <scan_type[,scan_type,...]>`
 5. Test in GitHub Actions by using the workflow_dispatch trigger
 
 ## License

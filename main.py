@@ -8,11 +8,11 @@ def main():
     # Get arguments passed from entrypoint.sh
     if len(sys.argv) < 3:
         print("Error: Missing required arguments")
-        print("Usage: python main.py <asset_id> <scan_type>")
+        print("Usage: python main.py <asset_id> <scan_type[,scan_type,...]>")
         sys.exit(1)
         
     asset_id = sys.argv[1]
-    scan_type_str = sys.argv[2]
+    scan_types_str = sys.argv[2]
     
     # Get credentials from environment
     client_id = os.environ.get('ARTEMIS_CLIENT_ID')
@@ -33,11 +33,19 @@ def main():
         'fingerprint': ScanType.fingerprint,
     }
     
-    if scan_type_str not in scan_type_map:
-        print(f"Error: Invalid scan type '{scan_type_str}'. Must be one of: {', '.join(scan_type_map.keys())}")
-        sys.exit(1)
+    # Split the scan types by comma
+    scan_types_list = [st.strip() for st in scan_types_str.split(',')]
+    scan_types = []
     
-    scan_type = scan_type_map[scan_type_str]
+    # Validate each scan type
+    for scan_type_str in scan_types_list:
+        if scan_type_str not in scan_type_map:
+            print(f"Error: Invalid scan type '{scan_type_str}'. Must be one of: {', '.join(scan_type_map.keys())}")
+            sys.exit(1)
+        scan_types.append(scan_type_map[scan_type_str])
+    
+    # If only one scan type is provided, use it directly instead of a list
+    scan_type_param = scan_types[0] if len(scan_types) == 1 else scan_types
     
     # Initialize client
     client = RepelloArtemisClient(
@@ -47,9 +55,9 @@ def main():
     )
     
     # Trigger scan
-    print(f"::group::Triggering {scan_type_str} for asset {asset_id}")
+    print(f"::group::Triggering scan(s) {scan_types_str} for asset {asset_id}")
     try:
-        scan_result = client.assets.trigger_scan(asset_id, scan_type)
+        scan_result = client.assets.trigger_scan(asset_id, scan_type_param)
         print("::endgroup::")
         
     except Exception as e:
