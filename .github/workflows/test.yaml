@@ -3,9 +3,9 @@ description: Test the Artemis action with a self-reference
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
   # Allow manual testing
   workflow_dispatch:
     inputs:
