@@ -57,7 +57,13 @@ def main():
     # Trigger scan
     print(f"::group::Triggering scan(s) {scan_types_str} for asset {asset_id}")
     try:
-        scan_result = client.assets.trigger_scan(asset_id, scan_type_param)
+        was_scan_triggered = client.assets.trigger_scan(asset_id, scan_type_param)
+
+        if not was_scan_triggered:
+            print("::error::Failed to trigger scan")
+            print("::endgroup::")
+            sys.exit(1)
+        
         print("::endgroup::")
         
     except Exception as e:
